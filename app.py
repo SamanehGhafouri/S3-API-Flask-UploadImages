@@ -1,7 +1,6 @@
 import os
 from flask import Flask, render_template, request, redirect, send_file
 from s3_demo import list_files, download_file, upload_file
-from os.path import join, dirname, realpath
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -28,8 +27,9 @@ def upload():
         f = request.files['file']
         f.save(os.path.join(UPLOAD_FOLDER, f.filename))
         upload_file(f"uploads/{f.filename}", BUCKET)
-
-        return redirect("/form")
+        data = {'file_name': f.filename, 'url': f'uploads/{f.filename}'}
+        # return redirect("/form")
+        return data
 
 
 @app.route("/downloads/<filename>", methods=['GET'])
