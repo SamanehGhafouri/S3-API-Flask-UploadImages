@@ -32,7 +32,7 @@ def upload():
         return redirect("/form")
 
 
-@app.route("/download/<filename>", methods=['GET'])
+@app.route("/downloads/<filename>", methods=['GET'])
 def download(filename):
     if request.method == 'GET':
         output = download_file(filename, BUCKET)
