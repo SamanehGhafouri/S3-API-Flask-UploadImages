@@ -22,14 +22,20 @@ def form():
 
 
 @app.route("/upload", methods=['POST'])
-def upload():
+def upload(file_type: str = None):
+    response = {}
+    file_types = ['png', 'jpg', 'jpeg', 'gif']
     if request.method == 'POST':
-        f = request.files['file']
-        f.save(os.path.join(UPLOAD_FOLDER, f.filename))
-        upload_file(f"uploads/{f.filename}", BUCKET)
-        data = {'file_name': f.filename, 'url': f'uploads/{f.filename}'}
-        # return redirect("/form")
-        return data
+        if request.content_type is not None and file_type not in file_types:
+            response['ERRROR'] = f"Accepting file types: {', '.join(file_types)}"
+            return response, 400
+        else:
+            f = request.files['file']
+            f.save(os.path.join(UPLOAD_FOLDER, f.filename))
+            upload_file(f"uploads/{f.filename}", BUCKET)
+            data = {'file_name': f.filename, 'url': f'uploads/{f.filename}'}
+            # return redirect("/form")
+            return data
 
 
 @app.route("/downloads/<filename>", methods=['GET'])
