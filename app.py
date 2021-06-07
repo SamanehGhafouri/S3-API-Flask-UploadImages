@@ -2,9 +2,11 @@ import os
 from flask import Flask, render_template, request, redirect, send_file
 from s3_demo import list_files, download_file, upload_file
 from flask_cors import CORS
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 CORS(app, resource={"/*": {"origins": ["*"]}})
+app.config['UPLOAD_EXTENSIONS'] = ['.png', '.jpg', '.jpeg', '.gif', '.JPG']
 
 UPLOAD_FOLDER = "uploads"
 BUCKET = "first-bucket-boto3"
@@ -22,18 +24,20 @@ def form():
 
 
 @app.route("/upload", methods=['POST'])
-def upload(file_type: str = None):
+def upload():
     response = {}
-    file_types = ['png', 'jpg', 'jpeg', 'gif']
-    if request.method == 'POST':
-        if request.content_type is not None and file_type not in file_types:
-            response['ERRROR'] = f"Accepting file types: {', '.join(file_types)}"
-            return response, 400
+    uploaded_file = request.files['file']
+    filename = secure_filename(uploaded_file.filename)
+    if filename != '':
+        file_ext = os.path.splitext(filename)[1]
+        if file_ext not in app.config['UPLOAD_EXTENSIONS']:
+            response['ERRROR'] = f"Accepting file types: {', '.join(app.config['UPLOAD_EXTENSIONS'])}"
+            return response
         else:
-            f = request.files['file']
-            f.save(os.path.join(UPLOAD_FOLDER, f.filename))
-            upload_file(f"uploads/{f.filename}", BUCKET)
-            data = {'file_name': f.filename, 'url': f'uploads/{f.filename}'}
+            uploaded_file = request.files['file']
+            uploaded_file.save(os.path.join(UPLOAD_FOLDER, uploaded_file.filename))
+            upload_file(f"uploads/{uploaded_file.filename}", BUCKET)
+            data = {'file_name': uploaded_file.filename, 'url': f'uploads/{uploaded_file.filename}'}
             # return redirect("/form")
             return data
 
