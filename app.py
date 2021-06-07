@@ -6,10 +6,16 @@ from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 CORS(app, resource={"/*": {"origins": ["*"]}})
-app.config['UPLOAD_EXTENSIONS'] = ['.png', '.jpg', '.jpeg', '.gif', '.JPG']
+app.config['UPLOAD_EXTENSIONS'] = ['.png', '.jpg', '.jpeg', '.gif', '.txt']
+app.config['MAX_CONTENT_LENGTH'] = 1.4 * 1000 * 1000
 
 UPLOAD_FOLDER = "uploads"
 BUCKET = "first-bucket-boto3"
+
+
+@app.errorhandler(413)
+def too_large(e):
+    return "File is too large", 413
 
 
 @app.route('/')
@@ -30,8 +36,8 @@ def upload():
     filename = secure_filename(uploaded_file.filename)
     if filename != '':
         file_ext = os.path.splitext(filename)[1]
-        if file_ext not in app.config['UPLOAD_EXTENSIONS']:
-            response['ERRROR'] = f"Accepting file types: {', '.join(app.config['UPLOAD_EXTENSIONS'])}"
+        if file_ext.lower() not in app.config['UPLOAD_EXTENSIONS']:
+            response['ERROR'] = f"Accepting file types: {', '.join(app.config['UPLOAD_EXTENSIONS'])}"
             return response
         else:
             uploaded_file = request.files['file']
