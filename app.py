@@ -15,7 +15,8 @@ BUCKET = "first-bucket-boto3"
 
 @app.errorhandler(413)
 def too_large(e):
-    return "File is too large", 413
+    response = {'ERROR': 'File is too large'}
+    return response, 413
 
 
 @app.route('/')
@@ -32,15 +33,15 @@ def form():
 @app.route("/upload", methods=['POST'])
 def upload():
     response = {}
-    uploaded_file = request.files['file']
+    _request = request
+    uploaded_file = request.files['File']
     filename = secure_filename(uploaded_file.filename)
     if filename != '':
         file_ext = os.path.splitext(filename)[1]
         if file_ext.lower() not in app.config['UPLOAD_EXTENSIONS']:
             response['ERROR'] = f"Accepting file types: {', '.join(app.config['UPLOAD_EXTENSIONS'])}"
-            return response
+            return response, 400
         else:
-            uploaded_file = request.files['file']
             uploaded_file.save(os.path.join(UPLOAD_FOLDER, uploaded_file.filename))
             upload_file(f"uploads/{uploaded_file.filename}", BUCKET)
             data = {'file_name': uploaded_file.filename, 'url': f'uploads/{uploaded_file.filename}'}
