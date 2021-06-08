@@ -34,7 +34,7 @@ def form():
 def upload():
     response = {}
     _request = request
-    uploaded_file = request.files['File']
+    uploaded_file = request.files['file']
     filename = secure_filename(uploaded_file.filename)
     if filename != '':
         file_ext = os.path.splitext(filename)[1]
