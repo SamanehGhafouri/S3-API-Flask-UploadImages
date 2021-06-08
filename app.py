@@ -1,6 +1,6 @@
 import os
 from flask import Flask, render_template, request, redirect, send_file
-from s3_demo import list_files, download_file, upload_file
+from s3_demo import list_files, download_file, upload_file, create_random_id
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 
@@ -36,15 +36,16 @@ def upload():
     _request = request
     uploaded_file = request.files['file']
     filename = secure_filename(uploaded_file.filename)
+    fileid = create_random_id(filename)
     if filename != '':
         file_ext = os.path.splitext(filename)[1]
         if file_ext.lower() not in app.config['UPLOAD_EXTENSIONS']:
             response['ERROR'] = f"Accepting file types: {', '.join(app.config['UPLOAD_EXTENSIONS'])}"
             return response, 400
         else:
-            uploaded_file.save(os.path.join(UPLOAD_FOLDER, uploaded_file.filename))
-            upload_file(f"uploads/{uploaded_file.filename}", BUCKET)
-            data = {'file_name': uploaded_file.filename, 'url': f'uploads/{uploaded_file.filename}'}
+            uploaded_file.save(os.path.join(UPLOAD_FOLDER, fileid))
+            upload_file(f"uploads/{fileid}", BUCKET)
+            data = {'original_filename': uploaded_file.filename, 'url': f'uploads/{fileid}', 'generated_filename': fileid}
             # return redirect("/form")
             return data
 

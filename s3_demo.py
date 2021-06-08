@@ -1,4 +1,5 @@
 import boto3
+import uuid
 
 
 def upload_file(file_name, bucket):
@@ -33,3 +34,11 @@ def list_files(bucket):
         contents.append(item)
 
     return contents
+
+
+def create_random_id(filename):
+    """
+    Randomly generated key for file
+    """
+    file_extention = filename[-4:]
+    return ''.join([str(uuid.uuid4()), file_extention])
