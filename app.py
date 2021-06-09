@@ -36,16 +36,16 @@ def upload():
     _request = request
     uploaded_file = request.files['file']
     filename = secure_filename(uploaded_file.filename)
-    fileid = create_random_id(filename)
+    generated_filename = create_random_id(filename)
     if filename != '':
         file_ext = os.path.splitext(filename)[1]
         if file_ext.lower() not in app.config['UPLOAD_EXTENSIONS']:
             response['ERROR'] = f"Accepting file types: {', '.join(app.config['UPLOAD_EXTENSIONS'])}"
             return response, 400
         else:
-            uploaded_file.save(os.path.join(UPLOAD_FOLDER, fileid))
-            upload_file(f"uploads/{fileid}", BUCKET)
-            data = {'original_filename': uploaded_file.filename, 'url': f'uploads/{fileid}', 'generated_filename': fileid}
+            uploaded_file.save(os.path.join(UPLOAD_FOLDER, generated_filename))
+            upload_file(f"uploads/{generated_filename}", BUCKET)
+            data = {'original_filename': uploaded_file.filename, 'url': f'uploads/{generated_filename}', 'generated_filename': generated_filename}
             # return redirect("/form")
             return data
 
