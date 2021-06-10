@@ -8,9 +8,9 @@ def upload_file(file_name, bucket):
     Function to upload a file to an S3 bucket
     """
     object_name = file_name
-    s3_client = boto3.client('s3')
-    response = s3_client.upload_file(file_name, bucket, object_name)
+    s3_resource = boto3.resource('s3')
 
+    response = s3_resource.meta.client.upload_file(file_name, bucket, object_name)
     return response
 
 
@@ -43,3 +43,12 @@ def create_random_id(filename):
     """
     file_ext = os.path.splitext(filename)[1]
     return ''.join([str(uuid.uuid4()), file_ext])
+
+
+if __name__ == '__main__':
+    try:
+        result = upload_file('1.JPG', 'first-bucket-boto')
+        print(result)
+        print(result.status_code)
+    except AssertionError as e:
+        print(e)

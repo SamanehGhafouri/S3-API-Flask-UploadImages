@@ -45,12 +45,19 @@ def upload():
             response['ERROR'] = f"Accepting file types: {', '.join(app.config['UPLOAD_EXTENSIONS'])}"
             return response, 400
         else:
-            uploaded_file.save(os.path.join(UPLOAD_FOLDER, generated_filename))
-            upload_file(f"uploads/{generated_filename}", BUCKET)
-            data = {'original_filename': uploaded_file.filename, 'url': f'uploads/{generated_filename}',
-                    'generated_filename': generated_filename}
+            try:
+                uploaded_file.save(os.path.join(UPLOAD_FOLDER, generated_filename))
+                upload_file(f"uploads/{generated_filename}", BUCKET)
+            except Exception as error:
+                response['ERROR'] = str(error)
+                status_code = 400
+            else:
+                response['original_filename'] = uploaded_file.filename
+                response['url'] = f'uploads/{generated_filename}'
+                response['generated_filename'] = generated_filename
+                status_code = 200
             # return redirect("/form")
-            return data
+            return response, status_code
 
 
 @app.route("/downloads/<filename>", methods=['GET'])
