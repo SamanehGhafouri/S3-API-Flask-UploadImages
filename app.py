@@ -6,7 +6,7 @@ from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 CORS(app, resource={"/*": {"origins": ["*"]}})
-app.config['UPLOAD_EXTENSIONS'] = ['.png', '.jpg', '.jpeg', '.gif', '.txt']
+app.config['UPLOAD_EXTENSIONS'] = ['.png', '.jpg', '.jpeg', '.gif']
 app.config['MAX_CONTENT_LENGTH'] = 1.4 * 1000 * 1000
 
 UPLOAD_FOLDER = "uploads"
