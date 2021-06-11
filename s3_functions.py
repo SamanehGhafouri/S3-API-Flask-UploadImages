@@ -40,12 +40,3 @@ def create_random_id(filename):
     """
     file_ext = os.path.splitext(filename)[1]
     return ''.join([str(uuid.uuid4()), file_ext])
-
-
-if __name__ == '__main__':
-    try:
-        result = upload_file('1.JPG', 'first-bucket-boto')
-        print(result)
-        print(result.status_code)
-    except AssertionError as e:
-        print(e)
