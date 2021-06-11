@@ -1,6 +1,6 @@
 import os
 from flask import Flask, render_template, request, redirect, send_file
-from s3_demo import list_files, download_file, upload_file, create_random_id
+from s3_functions import list_files, download_file, create_random_id, upload_file_obj
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 
@@ -9,7 +9,7 @@ CORS(app, resource={"/*": {"origins": ["*"]}})
 app.config['UPLOAD_EXTENSIONS'] = ['.png', '.jpg', '.jpeg', '.gif']
 app.config['MAX_CONTENT_LENGTH'] = 1.4 * 1000 * 1000
 
-UPLOAD_FOLDER = "uploads"
+UPLOAD_FOLDER = "uploads/"
 BUCKET = "first-bucket-boto3"
 
 
@@ -46,14 +46,15 @@ def upload():
             return response, 400
         else:
             try:
-                uploaded_file.save(os.path.join(UPLOAD_FOLDER, generated_filename))
-                upload_file(f"uploads/{generated_filename}", BUCKET)
+                relative_path = UPLOAD_FOLDER + generated_filename
+                upload_file_obj(uploaded_file, BUCKET, relative_path)
+
             except Exception as error:
                 response['ERROR'] = str(error)
                 status_code = 400
             else:
                 response['original_filename'] = uploaded_file.filename
-                response['url'] = f'uploads/{generated_filename}'
+                response['url'] = relative_path
                 response['generated_filename'] = generated_filename
                 status_code = 200
             # return redirect("/form")

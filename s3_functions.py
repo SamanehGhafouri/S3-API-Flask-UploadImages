@@ -3,15 +3,12 @@ import uuid
 import os
 
 
-def upload_file(file_name, bucket):
+def upload_file_obj(file, bucket, file_name):
     """
-    Function to upload a file to an S3 bucket
+    Function to upload a file to an S3 bucket without saving it locally
     """
-    object_name = file_name
-    s3_resource = boto3.resource('s3')
-
-    response = s3_resource.meta.client.upload_file(file_name, bucket, object_name)
-    return response
+    s3 = boto3.client('s3')
+    s3.upload_fileobj(file, bucket, file_name)
 
 
 def download_file(file_name, bucket):
